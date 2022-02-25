@@ -3,8 +3,8 @@ package com.example.tasks;
 public class Task {
     private final String title;
     private final String description;
-    int id;
     String status;
+    private int id;
 
     public Task(String title, String description) {
         this.title = title;
@@ -38,7 +38,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "com.example.tasks.Task{" +
+        return "Task{" +
                 "id='" + id + '\'' +
                 ", description='" + description + '\'' +
                 ", title=" + title +

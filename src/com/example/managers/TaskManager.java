@@ -3,6 +3,7 @@ package com.example.managers;
 import com.example.tasks.Epic;
 import com.example.tasks.SubTask;
 import com.example.tasks.Task;
+
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -46,7 +47,7 @@ public class TaskManager {
         }
     }
 
-    void clearAllTasks() {
+    public void clearAllTasks() {
         epics.clear();
         tasks.clear();
         subTasks.clear();
@@ -65,10 +66,14 @@ public class TaskManager {
         clearSubTasks();
     }
 
-    public Object getTaskById(Integer ID) {
-        if (tasks.containsKey(ID)) return tasks.get(ID);
-        if (subTasks.containsKey(ID)) return subTasks.get(ID);
-        if (epics.containsKey(ID)) return epics.get(ID);
+    public Task getTaskById(Integer ID) {
+        if (tasks.containsKey(ID)) {
+            return tasks.get(ID);
+        } else if (subTasks.containsKey(ID)) {
+            return subTasks.get(ID);
+        } else if (epics.containsKey(ID)) {
+            return epics.get(ID);
+        }
         System.out.println("Задачи с ID:" + ID + " не существует");
         return null;
     }
@@ -122,14 +127,18 @@ public class TaskManager {
                     doneFlag = false;
                 }
             }
-            if (doneFlag) epics.get(id).setStatus("DONE");
+            if (doneFlag) {
+                epics.get(id).setStatus("DONE");
+            }
             tasks.replace(id, epic);
         }
     }
 
     public void printEpicSubTasks(Integer id) {
-        if (epics.containsKey(id)) System.out.println("В задачу epic с ID:" + id +
-                " входят подзадачи с следующими ID:" + epics.get(id).getEpicSubTasksID());
+        if (epics.containsKey(id)) {
+            System.out.println("В задачу epic с ID:" + id +
+                    " входят подзадачи с следующими ID:" + epics.get(id).getEpicSubTasksID());
+        }
     }
 
     public HashMap<Integer, Task> getTasks() {

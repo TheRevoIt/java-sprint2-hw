@@ -2,12 +2,10 @@ package com.example.tasks;
 
 public class SubTask extends Task {
     private int epicId;
-    private Epic epic;
 
-    public SubTask(String title, String description, Object object) {
+    public SubTask(String title, String description, Epic epic) {
         super(title, description);
         try {
-            this.epic = (Epic) object;
             setEpicId(epic.getId());
         } catch (NullPointerException e) {
             System.out.println("Ссылка на неверный объект класса epic. Невозможно получить ID");
@@ -22,17 +20,13 @@ public class SubTask extends Task {
         this.epicId = epicId;
     }
 
-    public Epic getEpic() {
-        return epic;
-    }
-
     @Override
     public String toString() {
-        return "com.example.tasks.SubTask{" +
-                "id='" + id + '\'' +
+        return "SubTask{" +
+                "id='" + getId() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", title=" + getTitle() +
-                ", status='" + status + '\'' +
+                ", status='" + getStatus() + '\'' +
                 '}';
     }
 }
