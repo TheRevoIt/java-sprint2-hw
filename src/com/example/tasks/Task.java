@@ -3,13 +3,13 @@ package com.example.tasks;
 public class Task {
     private final String title;
     private final String description;
-    String status;
+    Status status;
     private int id;
 
     public Task(String title, String description) {
         this.title = title;
         this.description = description;
-        status = "NEW";
+        status = Status.NEW;
     }
 
     String getTitle() {
@@ -20,11 +20,11 @@ public class Task {
         return description;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
