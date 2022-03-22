@@ -4,26 +4,31 @@ import com.example.tasks.Epic;
 import com.example.tasks.Status;
 import com.example.tasks.SubTask;
 import com.example.tasks.Task;
+import com.util.Managers;
 
 import java.util.HashMap;
 import java.util.Objects;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static int taskId = 0;
+    private static int taskId = 1;
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HistoryManager history = Managers.getDefaultHistory();
 
+    public static int getTaskId() {
+        return taskId;
+    }
+
+    @Override
     public HistoryManager history() {
-        return this.history;
+        return history;
     }
 
     @Override
     public void createTask(Task task) {
-        if (task != null) {
+        if (Objects.nonNull(task)) {
             taskId++;
-            task.setId(taskId);
             tasks.put(task.getId(), task);
         } else {
             System.out.println("При создании task передан пустой объект");
@@ -32,9 +37,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createSubTask(SubTask subTask) {
-        if (subTask != null) {
+        if (Objects.nonNull(subTask)) {
             taskId++;
-            subTask.setId(taskId);
             int epicId = subTask.getEpicId();
             if (getEpics().get(epicId) != null) {
                 getEpics().get(epicId).addEpicSubTasksID(subTask.getId());
@@ -47,9 +51,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createEpic(Epic epic) {
-        if (epic != null) {
+        if (Objects.nonNull(epic)) {
             taskId++;
-            epic.setId(taskId);
             epics.put(epic.getId(), epic);
         } else {
             System.out.println("При создании epic передан пустой объект");
@@ -97,7 +100,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTaskById(Integer ID) {
-        if (tasks.remove(ID) == null) System.out.println("Объекта с ID " + ID + " нет в категории tasks");
+        if (tasks.remove(ID) == null) {
+            System.out.println("Объекта с ID " + ID + " нет в категории tasks");
+        }
     }
 
     @Override
@@ -133,7 +138,6 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubTask(Integer id, Object object, Status status) {
         SubTask subTask = (SubTask) object;
         subTask.setStatus(status);
-        subTask.setId(id);
         subTasks.replace(id, subTask);
     }
 
@@ -160,8 +164,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void printEpicSubTasks(Integer id) {
         if (epics.containsKey(id)) {
-            System.out.println("В задачу epic с ID:" + id +
-                    " входят подзадачи с следующими ID:" + epics.get(id).getEpicSubTasksID());
+            System.out.println("В задачу epic с ID:" + id + " входят подзадачи с следующими ID:" +
+                    epics.get(id).getEpicSubTasksID());
         }
     }
 
@@ -169,7 +173,6 @@ public class InMemoryTaskManager implements TaskManager {
     public HashMap<Integer, Task> getTasks() {
         return tasks;
     }
-
 
     @Override
     public HashMap<Integer, SubTask> getSubTasks() {

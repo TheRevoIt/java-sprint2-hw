@@ -1,26 +1,30 @@
-import com.example.managers.Managers;
+import com.example.managers.InMemoryTaskManager;
 import com.example.managers.TaskManager;
 import com.example.tasks.Epic;
 import com.example.tasks.Status;
 import com.example.tasks.SubTask;
 import com.example.tasks.Task;
+import com.util.Managers;
 
 class Main {
     public static void main(String[] args) {
         TaskManager manager = Managers.getDefault();
 
+        manager.createEpic(new Epic("Ремонт", "Ремонт в квартире", InMemoryTaskManager.getTaskId()));
+        manager.createSubTask(new SubTask("Стены", "Поклейка обоев", (Epic) manager.getTaskById(1),
+                InMemoryTaskManager.getTaskId()));
+        manager.createSubTask(new SubTask("Пол", "Укладка ламината", (Epic) manager.getTaskById(1),
+                InMemoryTaskManager.getTaskId()));
+        manager.createSubTask(new SubTask("Люстра", "Повесить люстру", (Epic) manager.getTaskById(1),
+                InMemoryTaskManager.getTaskId()));
 
-        manager.createEpic(new Epic("Ремонт", "Ремонт в квартире"));
-        manager.createSubTask(new SubTask("Стены", "Поклейка обоев", (Epic) manager.getTaskById(1)));
-        manager.createSubTask(new SubTask("Пол", "Укладка ламината", (Epic) manager.getTaskById(1)));
-        manager.createSubTask(new SubTask("Люстра", "Повесить люстру", (Epic) manager.getTaskById(1)));
-
-        manager.createEpic(new Epic("Задачи", "Задачи на месяц"));
-        manager.createSubTask(new SubTask("Учеба", "Изучение Java", (Epic) manager.getTaskById(5)));
+        manager.createEpic(new Epic("Задачи", "Задачи на месяц", InMemoryTaskManager.getTaskId()));
+        manager.createSubTask(new SubTask("Учеба", "Изучение Java", (Epic) manager.getTaskById(5),
+                InMemoryTaskManager.getTaskId()));
 
         System.out.println("История просмотра задач: " + manager.history().getHistory());
 
-        manager.createTask(new Task("Задача", "Описание задачи"));
+        manager.createTask(new Task("Задача", "Описание задачи", InMemoryTaskManager.getTaskId()));
 
         System.out.println(manager.getEpics());
         System.out.println(manager.getTasks());
@@ -29,12 +33,12 @@ class Main {
 
         manager.printEpicSubTasks(1);
 
-        manager.updateSubTask(2, new SubTask("Стены", "Поклейка обоев", (Epic) manager.getTaskById(1)),
-                Status.DONE);
-        manager.updateSubTask(3, new SubTask("Стены", "Поклейка обоев", (Epic) manager.getTaskById(1)),
-                Status.DONE);
-        manager.updateSubTask(4, new SubTask("Стены", "Повесить люстру", (Epic) manager.getTaskById(1)),
-                Status.DONE);
+        manager.updateSubTask(2, new SubTask("Стены", "Поклейка обоев",
+                (Epic) manager.getTaskById(1), InMemoryTaskManager.getTaskId()), Status.DONE);
+        manager.updateSubTask(3, new SubTask("Стены", "Поклейка обоев",
+                (Epic) manager.getTaskById(1), InMemoryTaskManager.getTaskId()), Status.DONE);
+        manager.updateSubTask(4, new SubTask("Стены", "Повесить люстру",
+                (Epic) manager.getTaskById(1), InMemoryTaskManager.getTaskId()), Status.DONE);
 
         System.out.println("История просмотра задач: " + manager.history().getHistory());
 

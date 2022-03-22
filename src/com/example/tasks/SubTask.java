@@ -3,8 +3,8 @@ package com.example.tasks;
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String title, String description, Epic epic) {
-        super(title, description);
+    public SubTask(String title, String description, Epic epic, int id) {
+        super(title, description, id);
         try {
             setEpicId(epic.getId());
         } catch (NullPointerException e) {

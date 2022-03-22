@@ -3,13 +3,14 @@ package com.example.tasks;
 public class Task {
     private final String title;
     private final String description;
-    Status status;
-    private int id;
+    private final int id;
+    private Status status;
 
-    public Task(String title, String description) {
+    public Task(String title, String description, int id) {
         this.title = title;
         this.description = description;
         status = Status.NEW;
+        this.id = id;
     }
 
     String getTitle() {
@@ -30,10 +31,6 @@ public class Task {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     @Override
