@@ -42,13 +42,10 @@ public interface TaskManager {
     void removeEpicById(Integer ID);
 
     // Метод обновляет подзадачу по ее ID
-    void updateSubTask(Integer id, Object object, Status status);
+    void updateSubTask(Integer id, SubTask subTask, Status status);
 
     // Метод обновляет обычную задачу по ее ID
     void updateTask(Integer id, Task task, Status status);
-
-    // Метод удаляет эпик-задачу по ее ID
-    void updateEpic(Integer id, Object object);
 
     // Метод выводит на экран список подзадач, относящихся к эпик-задаче с указанным ID
     void printEpicSubTasks(Integer id);

@@ -1,4 +1,4 @@
-package com.util;
+package com.example.util;
 
 import com.example.managers.HistoryManager;
 import com.example.managers.InMemoryHistoryManager;

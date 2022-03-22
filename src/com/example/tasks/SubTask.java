@@ -27,6 +27,7 @@ public class SubTask extends Task {
                 ", description='" + getDescription() + '\'' +
                 ", title=" + getTitle() +
                 ", status='" + getStatus() + '\'' +
+                ", epicId=" + getEpicId() +
                 '}';
     }
 }

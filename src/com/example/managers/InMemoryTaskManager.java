@@ -4,7 +4,7 @@ import com.example.tasks.Epic;
 import com.example.tasks.Status;
 import com.example.tasks.SubTask;
 import com.example.tasks.Task;
-import com.util.Managers;
+import com.example.util.Managers;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -40,9 +40,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (Objects.nonNull(subTask)) {
             taskId++;
             int epicId = subTask.getEpicId();
-            if (getEpics().get(epicId) != null) {
-                getEpics().get(epicId).addEpicSubTasksID(subTask.getId());
+            if (epics.get(epicId) != null) {
+                epics.get(epicId).addEpicSubTasksID(subTask.getId());
                 subTasks.put(subTask.getId(), subTask);
+                updateEpic(epics.get(epicId));
             }
         } else {
             System.out.println("При создании subTask передан пустой объект");
@@ -85,13 +86,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(Integer ID) {
         if (tasks.containsKey(ID)) {
-            this.history.add(tasks.get(ID));
+            history.add(tasks.get(ID));
             return tasks.get(ID);
         } else if (subTasks.containsKey(ID)) {
-            this.history.add(subTasks.get(ID));
+            history.add(subTasks.get(ID));
             return subTasks.get(ID);
         } else if (epics.containsKey(ID)) {
-            this.history.add(epics.get(ID));
+            history.add(epics.get(ID));
             return epics.get(ID);
         }
         System.out.println("Задачи с ID:" + ID + " не существует");
@@ -113,6 +114,7 @@ public class InMemoryTaskManager implements TaskManager {
             int epicID = subTasks.get(ID).getEpicId();
             epics.get(epicID).getEpicSubTasksID().remove(ID);
             subTasks.remove(ID);
+            updateEpic(epics.get(epicID));
         }
     }
 
@@ -130,34 +132,33 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Integer id, Task task, Status status) {
-        task.setStatus(status);
-        tasks.replace(id, task);
+        if (Objects.nonNull(getTaskById(id))) {
+            task.setStatus(status);
+            tasks.replace(id, task);
+        }
     }
 
     @Override
-    public void updateSubTask(Integer id, Object object, Status status) {
-        SubTask subTask = (SubTask) object;
+    public void updateSubTask(Integer id, SubTask subTask, Status status) {
         subTask.setStatus(status);
         subTasks.replace(id, subTask);
+        updateEpic(epics.get(subTask.getEpicId()));
     }
 
-    @Override
-    public void updateEpic(Integer id, Object object) {
-        if (epics.get(id) == null || (object.getClass() != Epic.class)) {
-            System.out.println("Не удается найти и обновить эпик-задачу с ID:" + id);
-        } else {
-            Epic epic = (Epic) object;
-            boolean doneFlag = true;
-            for (int TaskId : epic.getEpicSubTasksID()) {
-                if (!Objects.equals(subTasks.get(TaskId).getStatus(), Status.DONE)) {
-                    epics.get(id).setStatus(Status.IN_PROGRESS);
-                    doneFlag = false;
-                }
+    private void updateEpic(Epic epic) {
+        boolean doneFlag = true;
+        if (epic.getEpicSubTasksID().isEmpty()) {
+            epics.get(epic.getId()).setStatus(Status.NEW);
+            doneFlag = false;
+        }
+        for (int TaskId : epic.getEpicSubTasksID()) {
+            if (!Objects.equals(subTasks.get(TaskId).getStatus(), Status.DONE)) {
+                epics.get(epic.getId()).setStatus(Status.IN_PROGRESS);
+                doneFlag = false;
             }
-            if (doneFlag) {
-                epics.get(id).setStatus(Status.DONE);
-            }
-            tasks.replace(id, epic);
+        }
+        if (doneFlag) {
+            epics.get(epic.getId()).setStatus(Status.DONE);
         }
     }
 

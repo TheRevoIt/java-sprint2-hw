@@ -4,7 +4,7 @@ import com.example.tasks.Epic;
 import com.example.tasks.Status;
 import com.example.tasks.SubTask;
 import com.example.tasks.Task;
-import com.util.Managers;
+import com.example.util.Managers;
 
 class Main {
     public static void main(String[] args) {
@@ -34,18 +34,17 @@ class Main {
         manager.printEpicSubTasks(1);
 
         manager.updateSubTask(2, new SubTask("Стены", "Поклейка обоев",
-                (Epic) manager.getTaskById(1), InMemoryTaskManager.getTaskId()), Status.DONE);
+                (Epic) manager.getTaskById(1), 2), Status.DONE);
         manager.updateSubTask(3, new SubTask("Стены", "Поклейка обоев",
-                (Epic) manager.getTaskById(1), InMemoryTaskManager.getTaskId()), Status.DONE);
+                (Epic) manager.getTaskById(1), 3), Status.DONE);
         manager.updateSubTask(4, new SubTask("Стены", "Повесить люстру",
-                (Epic) manager.getTaskById(1), InMemoryTaskManager.getTaskId()), Status.DONE);
+                (Epic) manager.getTaskById(1), 4), Status.DONE);
 
         System.out.println("История просмотра задач: " + manager.history().getHistory());
 
-        manager.updateEpic(1, manager.getTaskById(1));
-        manager.updateEpic(5, manager.getTaskById(5));
-
         manager.updateTask(7, manager.getTaskById(7), Status.IN_PROGRESS);
+
+        manager.removeSubTaskById(6);
 
         System.out.println(manager.getEpics());
         System.out.println(manager.getTasks());
