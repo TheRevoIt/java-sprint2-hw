@@ -60,5 +60,5 @@ public interface TaskManager {
     HashMap<Integer, Epic> getEpics();
 
     // Метод возвращает объект менеджера истории просмотров
-    HistoryManager history();
+    HistoryManager getHistoryManager();
 }
