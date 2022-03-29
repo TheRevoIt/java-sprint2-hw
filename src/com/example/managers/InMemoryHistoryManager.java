@@ -2,10 +2,9 @@ package com.example.managers;
 
 import com.example.tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.util.Objects.isNull;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> elements;
@@ -13,44 +12,40 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node tail;
 
     public InMemoryHistoryManager() {
-        this.elements = new HashMap<>();
+        elements = new HashMap<>();
     }
 
     @Override
     public void add(Task task) {
+        if (elements.containsKey(task.getId())) {
+            remove(task.getId());
+        }
         linkLast(task);
     }
 
     private void linkLast(Task element) {
-        if (elements.containsKey(element.getId())) {
-            remove(element.getId());
-        }
-        final Node old = tail;
-        final Node newNode = new Node(old, element, null);
-        tail = newNode;
-        if (old == null) {
+        final Node newNode = new Node(tail, element, null);
+        if (isNull(head)) {
             head = newNode;
+        } else {
+            tail.setNext(newNode);
         }
-        if (old != null) {
-            old.next = newNode;
-        }
+        tail = newNode;
         elements.put(element.getId(), newNode);
     }
 
     private List<Task> getTasks() {
-        final ArrayList<Task> history = new ArrayList<>();
-        if (head != null) {
-            Node node = this.head;
-            while (node != null) {
-                history.add(node.item);
-                node = node.next;
-            }
+        final ArrayList<Task> tasks = new ArrayList<>();
+        Node current = head;
+        while (Objects.nonNull(current)) {
+            tasks.add(current.getItem());
+            current = current.getNext();
         }
-        return history;
+        return tasks;
     }
 
     @Override
-    public List<Task> history() {
+    public List<Task> getHistory() {
         return getTasks();
     }
 
@@ -58,15 +53,15 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void remove(int id) {
         Node node = elements.get(id);
         if (node != null) {
-            Node previous = node.previous;
-            Node next = node.next;
-            if (previous != null) {
-                previous.next = next;
+            Node previous = node.getPrevious();
+            Node next = node.getNext();
+            if (node.hasPrev()) {
+                previous.setNext(next);
             } else {
                 head = next;
             }
-            if (next != null) {
-                next.previous = previous;
+            if (node.hasNext()) {
+                next.setPrevious(previous);
             } else {
                 tail = previous;
             }
@@ -84,7 +79,33 @@ public class InMemoryHistoryManager implements HistoryManager {
             this.item = element;
             this.next = next;
         }
+
+        Task getItem() {
+            return item;
+        }
+
+        Node getPrevious() {
+            return previous;
+        }
+
+        void setPrevious(Node previous) {
+            this.previous = previous;
+        }
+
+        Node getNext() {
+            return next;
+        }
+
+        void setNext(Node next) {
+            this.next = next;
+        }
+
+        boolean hasNext() {
+            return Objects.nonNull(next);
+        }
+
+        boolean hasPrev() {
+            return Objects.nonNull(previous);
+        }
     }
 }
-
-
