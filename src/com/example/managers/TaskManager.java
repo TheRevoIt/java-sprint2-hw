@@ -14,7 +14,7 @@ public interface TaskManager {
     // Метод создает подзадачу
     void createSubTask(SubTask subTask);
 
-    // Метод создает эпик-задачу
+    // Метод создает эпическую задачу
     void createEpic(Epic epic);
 
     // Метод удаляет задачи всех типов
@@ -26,7 +26,7 @@ public interface TaskManager {
     // Метод удаляет все подзадачи
     void clearSubTasks();
 
-    // Метод удаляет все эпик-задачи
+    // Метод удаляет все эпические задачи
     void clearEpics();
 
     // Метод возвращает задачу любого типа по ее ID
@@ -35,10 +35,10 @@ public interface TaskManager {
     // Метод удаляет обычную задачу по ее ID
     void removeTaskById(Integer ID);
 
-    // Метод удаляет  подзадачу по ее ID
+    // Метод удаляет подзадачу по ее ID
     void removeSubTaskById(Integer ID);
 
-    // Метод удаляет эпик-задачу по ее ID
+    // Метод удаляет эпическую задачу по ее ID
     void removeEpicById(Integer ID);
 
     // Метод обновляет подзадачу по ее ID
@@ -47,16 +47,16 @@ public interface TaskManager {
     // Метод обновляет обычную задачу по ее ID
     void updateTask(Integer id, Task task, Status status);
 
-    // Метод выводит на экран список подзадач, относящихся к эпик-задаче с указанным ID
+    // Метод выводит на экран список подзадач, относящихся к эпической задаче с указанным ID
     void printEpicSubTasks(Integer id);
 
-    // Метод возращет словарь, содержащий все обычные задачи и их ID
+    // Метод возвращает словарь, содержащий все обычные задачи и их ID
     HashMap<Integer, Task> getTasks();
 
-    // Метод возращет словарь, содержащий все подзадачи и их ID
+    // Метод возвращает словарь, содержащий все подзадачи и их ID
     HashMap<Integer, SubTask> getSubTasks();
 
-    // Метод возращет словарь, содержащий все эпик-задачи и их ID
+    // Метод возвращает словарь, содержащий все эпические задачи и их ID
     HashMap<Integer, Epic> getEpics();
 
     // Метод возвращает объект менеджера истории просмотров

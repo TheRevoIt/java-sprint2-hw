@@ -8,16 +8,13 @@ import com.example.util.Managers;
 import static com.example.managers.InMemoryTaskManager.getTaskId;
 
 class Main {
-    public static void main(String[] args) {
 
+    public static void main(String[] args) {
         TaskManager manager = Managers.getDefault();
         manager.createEpic(new Epic("Ремонт", "Ремонт в квартире", getTaskId()));
-        manager.createSubTask(new SubTask("Стены", "Поклейка обоев", manager.getEpics().get(1),
-                getTaskId()));
-        manager.createSubTask(new SubTask("Пол", "Укладка ламината", manager.getEpics().get(1),
-                getTaskId()));
-        manager.createSubTask(new SubTask("Люстра", "Повесить люстру", manager.getEpics().get(1),
-                getTaskId()));
+        manager.createSubTask(new SubTask("Стены", "Поклейка обоев", manager.getEpics().get(1), getTaskId()));
+        manager.createSubTask(new SubTask("Пол", "Укладка ламината", manager.getEpics().get(1), getTaskId()));
+        manager.createSubTask(new SubTask("Люстра", "Повесить люстру", manager.getEpics().get(1), getTaskId()));
         manager.createEpic(new Epic("Задачи", "Задачи на месяц", getTaskId()));
         manager.getTaskById(3);
         System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
