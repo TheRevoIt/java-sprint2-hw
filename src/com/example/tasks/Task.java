@@ -1,10 +1,13 @@
 package com.example.tasks;
 
+import com.example.managers.Type;
+
 public class Task {
     private final String title;
     private final String description;
     private final int id;
     private Status status = Status.NEW;
+    private final Type type = Type.TASK;
 
     public Task(String title, String description, int id) {
         this.title = title;
@@ -32,13 +35,14 @@ public class Task {
         return id;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     @Override
     public String toString() {
-        return "Task{" +
-                "id='" + id + '\'' +
-                ", description='" + description + '\'' +
-                ", title=" + title +
-                ", status='" + status + '\'' +
-                '}';
+        return id + "," + type + "," +
+                title + "," + status + "," +
+                description;
     }
 }

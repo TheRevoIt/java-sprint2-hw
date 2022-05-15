@@ -1,5 +1,7 @@
 package com.example.tasks;
 
+import com.example.managers.Type;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -18,12 +20,14 @@ public class Epic extends Task {
     }
 
     @Override
+    public Type getType() {
+        return Type.EPIC;
+    }
+
+    @Override
     public String toString() {
-        return "Epic{" +
-                "id='" + getId() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", title=" + getTitle() +
-                ", status='" + getStatus() + '\'' +
-                '}';
+        return getId() + "," + getType() + "," +
+                getTitle() + "," + getStatus() + "," +
+                getDescription();
     }
 }

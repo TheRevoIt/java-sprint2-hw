@@ -1,5 +1,7 @@
 package com.example.tasks;
 
+import com.example.managers.Type;
+
 public class SubTask extends Task {
     private int epicId;
 
@@ -21,13 +23,14 @@ public class SubTask extends Task {
     }
 
     @Override
+    public Type getType() {
+        return Type.SUBTASK;
+    }
+
+    @Override
     public String toString() {
-        return "SubTask{" +
-                "id='" + getId() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", title=" + getTitle() +
-                ", status='" + getStatus() + '\'' +
-                ", epicId=" + getEpicId() +
-                '}';
+        return getId() + "," + getType() + "," +
+                getTitle() + "," + getStatus() + "," +
+                getDescription() + "," + getEpicId();
     }
 }

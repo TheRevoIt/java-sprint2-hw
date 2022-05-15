@@ -2,11 +2,7 @@ package com.example.managers;
 
 import com.example.tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 
@@ -28,7 +24,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void linkLast(Task element) {
-        final Node newNode = new Node(tail, element, null);
+        final Node newNode = new Node(tail, element);
         if (isNull(head)) {
             head = newNode;
         } else {
@@ -78,10 +74,10 @@ public class InMemoryHistoryManager implements HistoryManager {
         private Node previous;
         private Node next;
 
-        Node(Node prev, Task element, Node next) {
+        Node(Node prev, Task element) {
             this.previous = prev;
             this.item = element;
-            this.next = next;
+            this.next = null;
         }
 
         Task getItem() {
