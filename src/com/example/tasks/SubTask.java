@@ -1,7 +1,5 @@
 package com.example.tasks;
 
-import com.example.managers.Type;
-
 public class SubTask extends Task {
     private int epicId;
 

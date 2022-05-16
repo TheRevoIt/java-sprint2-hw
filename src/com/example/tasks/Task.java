@@ -1,13 +1,11 @@
 package com.example.tasks;
 
-import com.example.managers.Type;
-
 public class Task {
     private final String title;
     private final String description;
     private final int id;
-    private Status status = Status.NEW;
     private final Type type = Type.TASK;
+    private Status status = Status.NEW;
 
     public Task(String title, String description, int id) {
         this.title = title;

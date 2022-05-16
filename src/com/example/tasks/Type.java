@@ -1,4 +1,4 @@
-package com.example.managers;
+package com.example.tasks;
 
 public enum Type {
     TASK,
