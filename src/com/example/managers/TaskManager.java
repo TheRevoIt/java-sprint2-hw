@@ -5,7 +5,10 @@ import com.example.tasks.Status;
 import com.example.tasks.SubTask;
 import com.example.tasks.Task;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 public interface TaskManager {
     // Метод создает задачу
@@ -42,13 +45,13 @@ public interface TaskManager {
     void removeEpicById(Integer ID);
 
     // Метод обновляет подзадачу по ее ID
-    void updateSubTask(Integer id, SubTask subTask, Status status);
+    void updateSubTask(Integer id, SubTask subTask, Status status, LocalDateTime dateTime, long duration);
 
     // Метод обновляет обычную задачу по ее ID
-    void updateTask(Integer id, Task task, Status status);
+    void updateTask(Integer id, Task task, Status status, LocalDateTime dateTime, long duration);
 
     // Метод выводит на экран список подзадач, относящихся к эпической задаче с указанным ID
-    void printEpicSubTasks(Integer id);
+    ArrayList<Integer> getEpicSubTasks(Integer id);
 
     // Метод возвращает словарь, содержащий все обычные задачи и их ID
     HashMap<Integer, Task> getTasks();
@@ -61,4 +64,6 @@ public interface TaskManager {
 
     // Метод возвращает объект менеджера истории просмотров
     HistoryManager getHistoryManager();
+
+    TreeSet<Task> getPrioritizedTasks();
 }

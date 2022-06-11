@@ -1,9 +1,3 @@
-id,type,name,status,description,epic
-6,TASK,Задача,NEW,Пример задачи
-1,EPIC,Ремонт,DONE,Ремонт в квартире
-5,EPIC,Задачи,NEW,Задачи на месяц
-2,SUBTASK,Стены,DONE,Поклейка обоев,1
-3,SUBTASK,Пол,DONE,Укладка ламината,1
-4,SUBTASK,Люстра,DONE,Повесить люстру,1
+id,type,name,status,description,epic,dateTime,duration
 
-1,2,3
+3,0

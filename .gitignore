@@ -39,6 +39,6 @@ hs_err_pid*
 
 # IntelliJ
 /out/
+/lib/
 
 .idea/inspectionProfiles
-

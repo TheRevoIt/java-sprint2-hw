@@ -1,14 +1,18 @@
 package com.example.tasks;
 
+import com.example.exception.TaskByIdAbsentException;
+
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String title, String description, Epic epic, int id) {
-        super(title, description, id);
+    public SubTask(String title, String description, Epic epic, int id, LocalDateTime startTime, int duration) {
+        super(title, description, id, startTime, duration);
         try {
             setEpicId(epic.getId());
         } catch (NullPointerException e) {
-            System.out.println("Ссылка на неверный объект класса epic. Невозможно получить ID");
+            throw new TaskByIdAbsentException("Ссылка на неверный объект класса epic. Невозможно получить ID");
         }
     }
 
@@ -29,6 +33,7 @@ public class SubTask extends Task {
     public String toString() {
         return getId() + "," + getType() + "," +
                 getTitle() + "," + getStatus() + "," +
-                getDescription() + "," + getEpicId();
+                getDescription() + "," + getEpicId() + "," +
+                getStartTime() + "," + getDuration();
     }
 }
