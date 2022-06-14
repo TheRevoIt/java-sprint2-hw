@@ -1,0 +1,9 @@
+id,type,name,status,description,epic,dateTime,duration
+1,EPIC,Ремонт,IN_PROGRESS,Ремонт в квартире,2022-05-31T10:30,260
+6,EPIC,Задачи,NEW,Задачи на месяц,null,0
+2,SUBTASK,Стены,NEW,Поклейка обоев,1,2022-05-31T10:30,30
+3,SUBTASK,Пол,NEW,Укладка ламината,1,2022-06-04T12:00,100
+4,SUBTASK,Люстра,NEW,Повесить люстру,1,2022-07-04T12:00,100
+5,SUBTASK,Стены111,NEW,Поклейка обоев,1,null,30
+
+3,1,2

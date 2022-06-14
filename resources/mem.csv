@@ -1,3 +1,6 @@
 id,type,name,status,description,epic,dateTime,duration
+1,EPIC,Ремонт,IN_PROGRESS,Ремонт в квартире,2022-05-31T10:30,130
+2,SUBTASK,Стены,DONE,Поклейка обоев,1,2022-05-31T10:30,30
+3,SUBTASK,Пол,NEW,Укладка ламината,1,2022-06-04T12:00,100
 
-3,0
+2,3,1

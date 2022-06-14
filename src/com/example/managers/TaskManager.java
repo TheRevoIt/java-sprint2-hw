@@ -1,16 +1,17 @@
 package com.example.managers;
 
 import com.example.tasks.Epic;
-import com.example.tasks.Status;
 import com.example.tasks.SubTask;
 import com.example.tasks.Task;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
 public interface TaskManager {
+    //Метод добавляет задачу в отсортированный список
+    void addPrioritizedTask(Task task);
+
     // Метод создает задачу
     void createTask(Task task);
 
@@ -45,10 +46,12 @@ public interface TaskManager {
     void removeEpicById(Integer ID);
 
     // Метод обновляет подзадачу по ее ID
-    void updateSubTask(Integer id, SubTask subTask, Status status, LocalDateTime dateTime, long duration);
+    void updateSubTask(SubTask subTask);
 
     // Метод обновляет обычную задачу по ее ID
-    void updateTask(Integer id, Task task, Status status, LocalDateTime dateTime, long duration);
+    void updateTask(Task task);
+
+    void updateEpic(Epic epic);
 
     // Метод выводит на экран список подзадач, относящихся к эпической задаче с указанным ID
     ArrayList<Integer> getEpicSubTasks(Integer id);
@@ -61,6 +64,12 @@ public interface TaskManager {
 
     // Метод возвращает словарь, содержащий все эпические задачи и их ID
     HashMap<Integer, Epic> getEpics();
+
+    // Метод увеличивает счетчик id при добавлении задачи
+    void setTaskId();
+
+    // Метод возвращает id задачи
+    int getTaskId();
 
     // Метод возвращает объект менеджера истории просмотров
     HistoryManager getHistoryManager();

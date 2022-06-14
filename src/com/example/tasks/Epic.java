@@ -7,12 +7,12 @@ public class Epic extends Task {
     private final ArrayList<Integer> epicSubTasksID = new ArrayList<>();
     private LocalDateTime endTime;
 
-    public Epic(String title, String description, int id) {
-        super(title, description, id);
+    public Epic(String title, String description, int id, LocalDateTime parse, long parseInt) {
+        super(title, description, id, parse, parseInt);
     }
 
-    public Epic(String title, String description, int id, LocalDateTime parse, int parseInt) {
-        super(title, description, id, parse, parseInt);
+    public Epic(String title, String description, int id) {
+        super(title, description, id);
     }
 
     public ArrayList<Integer> getEpicSubTasksID() {
@@ -23,10 +23,6 @@ public class Epic extends Task {
         if (!epicSubTasksID.contains(subTaskID)) {
             epicSubTasksID.add(subTaskID);
         }
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
     }
 
     @Override
@@ -44,6 +40,10 @@ public class Epic extends Task {
         return endTime;
     }
 
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     @Override
     public Type getType() {
         return Type.EPIC;
@@ -53,7 +53,7 @@ public class Epic extends Task {
     public String toString() {
         return getId() + "," + getType() + "," +
                 getTitle() + "," + getStatus() + "," +
-                getDescription()  + "," + getStartTime() +
+                getDescription() + "," + getStartTime() +
                 "," + getDuration();
     }
 }

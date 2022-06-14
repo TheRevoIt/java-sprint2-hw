@@ -1,6 +1,5 @@
 package com.example.managers;
 
-import com.example.exception.CreateTaskException;
 import com.example.exception.ManagerSaveException;
 import com.example.exception.RemoveByIdException;
 import com.example.tasks.Epic;
@@ -15,33 +14,39 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.TreeSet;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
     private static final String HEADER_CSV = "id,type,name,status,description,epic,dateTime,duration";
-    private final TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime,
-            Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(Task::getId));
+    private final Path path;
+    private final File dataFile;
+
+    public FileBackedTasksManager(File file) {
+        this.path = file.toPath().getParent();
+        this.dataFile = file.toPath().getFileName().toFile();
+    }
 
     public static void main(String[] args) {
         TaskManager manager = Managers.getDefault();
-        manager.createEpic(new Epic("Ремонт", "Ремонт в квартире", getTaskId()));
-        manager.createSubTask(new SubTask("Стены", "Поклейка обоев", manager.getEpics().get(1), getTaskId(),
-                LocalDateTime.of(2022, 5, 31, 10, 30), 30));
-        manager.createSubTask(new SubTask("Пол", "Укладка ламината", manager.getEpics().get(1), getTaskId(),
-                LocalDateTime.of(2022, 6, 4, 12, 0), 100));
-        manager.createSubTask(new SubTask("Люстра", "Повесить люстру", manager.getEpics().get(1), getTaskId(),
-                LocalDateTime.of(2022, 7, 4, 12, 0), 100));
-        manager.createSubTask(new SubTask("Стены111", "Поклейка обоев", manager.getEpics().get(1), getTaskId(),
-                null, 30));
-        manager.createEpic(new Epic("Задачи", "Задачи на месяц", getTaskId()));
-        manager.createTask(new Task("Задача", "Пример задачи", getTaskId(), LocalDateTime.of(2022, 6, 4, 14, 0), 100));
+        manager.createEpic(new Epic("Ремонт", "Ремонт в квартире", manager.getTaskId()));
+        manager.createSubTask(new SubTask("Стены", "Поклейка обоев", manager.getEpics().get(1),
+                manager.getTaskId(), LocalDateTime.of(2022, 5, 31,
+                10, 30), 30));
+        manager.createSubTask(new SubTask("Пол", "Укладка ламината", manager.getEpics().get(1),
+                manager.getTaskId(), LocalDateTime.of(2022, 6, 4,
+                12, 0), 100));
+        manager.createSubTask(new SubTask("Люстра", "Повесить люстру", manager.getEpics().get(1),
+                manager.getTaskId(), LocalDateTime.of(2022, 7, 4,
+                12, 0), 100));
+        manager.createSubTask(new SubTask("Стены111", "Поклейка обоев", manager.getEpics().get(1),
+                manager.getTaskId(),null, 30));
+        manager.createEpic(new Epic("Задачи", "Задачи на месяц", manager.getTaskId()));
+        manager.createTask(new Task("Задача", "Пример задачи", manager.getTaskId(),
+                LocalDateTime.of(2022, 6, 4, 14, 0), 100));
         manager.removeTaskById(7);
         System.out.println("Prioritized: " + manager.getPrioritizedTasks());
         manager.getTaskById(3);
@@ -49,12 +54,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         manager.getTaskById(2);
         System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
         FileBackedTasksManager manager1 = loadFromFile(new File("resources//mem.csv"));
-        manager1.updateSubTask(2, manager1.getSubTasks().get(2), Status.DONE,
-                manager.getSubTasks().get(2).getStartTime(), 30);
-        manager1.updateSubTask(3, manager1.getSubTasks().get(3), Status.DONE,
-                manager.getSubTasks().get(3).getStartTime(), 30);
-        manager1.updateSubTask(4, manager1.getSubTasks().get(4), Status.DONE,
-                manager.getSubTasks().get(4).getStartTime(), 30);
+        manager.updateSubTask(new SubTask("Стены", "Поклейка обоев", manager.getEpics().get(1), 2,
+                LocalDateTime.of(2022, 5, 31, 10, 30), 30, Status.DONE));
+        manager.updateSubTask(new SubTask("Пол", "Укладка ламината", manager.getEpics().get(1), 3,
+                LocalDateTime.of(2022, 6, 4, 12, 0), 30, Status.DONE));
+        manager.updateSubTask(new SubTask("Люстра", "Повесить люстру", manager.getEpics().get(1), 4,
+                LocalDateTime.of(2022, 7, 4, 12, 0), 30, Status.DONE));
         System.out.println(manager1.getTasks());
         System.out.println(manager1.getSubTasks());
         System.out.println(manager1.getEpics());
@@ -64,7 +69,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     static FileBackedTasksManager loadFromFile(File file) {
-        FileBackedTasksManager manager = new FileBackedTasksManager();
+        FileBackedTasksManager manager = new FileBackedTasksManager(file);
         try {
             List<String> content = Files.readAllLines(Path.of(file.getPath()));
             for (int i = 1; i < content.size() - 2; i++) {
@@ -75,6 +80,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                         break;
                     case SUBTASK:
                         manager.subTasks.put(task.getId(), (SubTask) task);
+                        manager.updateSubTask((SubTask) task);
                         break;
                     case EPIC:
                         manager.epics.put(task.getId(), (Epic) task);
@@ -112,17 +118,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return history;
     }
 
-    public TreeSet<Task> getPrioritizedTasks() {
-        return prioritizedTasks;
-    }
-
     void save() {
-        if (!Files.exists(Paths.get("resources"))) {
-            File directory = new File("resources");
+        if (!Files.exists(path)) {
+            File directory = new File(String.valueOf(path));
             boolean creation = directory.mkdir();
             if (!creation) System.out.println("Ошибка при создании директории.");
         }
-        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter("resources//mem.csv"))) {
+        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(path + File.separator
+                + dataFile))) {
             fileWriter.write(HEADER_CSV);
             fileWriter.newLine();
             for (Task task : getTasks().values()) {
@@ -138,7 +141,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 fileWriter.newLine();
             }
             fileWriter.newLine();
-            fileWriter.write(toString(getHistoryManager()));
+            if (toString(getHistoryManager()).isBlank()) {
+                fileWriter.newLine();
+            } else {
+                fileWriter.write(toString(getHistoryManager()));
+            }
         } catch (IOException e) {
             throw new ManagerSaveException("Can't save to file: mem.csv", e);
         }
@@ -151,17 +158,19 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             case "TASK":
                 if (!content[5].equals("null"))
                     return new Task(content[2], content[4], Integer.parseInt(content[0]),
-                            LocalDateTime.parse(content[5]), Integer.parseInt(content[6]));
+                            LocalDateTime.parse(content[5]), Integer.parseInt(content[6]), Status.valueOf(content[3]));
                 else
                     return new Task(content[2], content[4], Integer.parseInt(content[0]), null,
-                            Integer.parseInt(content[6]));
+                            Integer.parseInt(content[6]), Status.valueOf(content[3]));
             case "SUBTASK":
-                if (!content[6].equals("null"))
+                if (!content[6].equals("null")) {
                     return new SubTask(content[2], content[4], getEpics().get(Integer.valueOf(content[5])),
-                            Integer.parseInt(content[0]), LocalDateTime.parse(content[6]), Integer.parseInt(content[7]));
-                else
+                            Integer.parseInt(content[0]), LocalDateTime.parse(content[6]), Integer.parseInt(content[7]),
+                            Status.valueOf(content[3]));
+                } else
                     return new SubTask(content[2], content[4], getEpics().get(Integer.valueOf(content[5])),
-                            Integer.parseInt(content[0]), null, Integer.parseInt(content[7]));
+                            Integer.parseInt(content[0]), null, Integer.parseInt(content[7]),
+                            Status.valueOf(content[3]));
             case "EPIC":
                 if (!content[5].equals("null") && !content[6].equals("null"))
                     return new Epic(content[2], content[4], Integer.parseInt(content[0]),
@@ -171,33 +180,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return null;
     }
 
-    private void addPrioritizedTask(Task task) {
-        boolean overlapFlag = false;
-        TreeSet<Task> priorityTask = getPrioritizedTasks();
-        priorityTask.add(task);
-        List<Task> priorityList = new ArrayList<>(getPrioritizedTasks());
-        for (int i = 1; i < priorityList.size(); i++)
-            if (priorityList.get(i).getStartTime() == null) break;
-            else if (priorityList.get(i - 1).getEndTime().isAfter(priorityList.get(i).getStartTime()) ||
-                    priorityList.get(i - 1).getEndTime().equals(priorityList.get(i).getStartTime()))
-                overlapFlag = true;
-        if (!overlapFlag) save();
-        else {
-            prioritizedTasks.remove(task);
-            throw new CreateTaskException("Происходит перекрытие задач по времени");
-        }
-    }
-
     @Override
     public void createTask(Task task) {
         addPrioritizedTask(task);
         super.createTask(task);
+        save();
     }
 
     @Override
     public void createSubTask(SubTask subTask) {
         addPrioritizedTask(subTask);
         super.createSubTask(subTask);
+        save();
     }
 
     @Override
@@ -208,21 +202,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public void clearAllTasks() {
-        prioritizedTasks.clear();
+        getPrioritizedTasks().clear();
         super.clearAllTasks();
         save();
     }
 
     @Override
     public void clearTasks() {
-        for (Task el : tasks.values()) prioritizedTasks.remove(el);
+        for (Task el : tasks.values()) getPrioritizedTasks().remove(el);
         super.clearTasks();
         save();
     }
 
     @Override
     public void clearSubTasks() {
-        for (SubTask el : subTasks.values()) prioritizedTasks.remove(el);
+        for (SubTask el : subTasks.values()) getPrioritizedTasks().remove(el);
         super.clearSubTasks();
         save();
     }
@@ -234,47 +228,49 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeTaskById(Integer ID) {
+    public void removeTaskById(Integer id) {
         try {
-            prioritizedTasks.remove(getTaskById(ID));
-            super.removeTaskById(ID);
+            getPrioritizedTasks().remove(getTaskById(id));
+            super.removeTaskById(id);
             save();
         } catch (RuntimeException e) {
-            throw new RemoveByIdException("В списке нет задачи с id " + ID);
+            throw new RemoveByIdException("В списке нет задачи с id " + id);
         }
     }
 
     @Override
-    public void removeSubTaskById(Integer ID) {
+    public void removeSubTaskById(Integer id) {
         try {
-            prioritizedTasks.remove(getTaskById(ID));
-            super.removeSubTaskById(ID);
+            getPrioritizedTasks().remove(getTaskById(id));
+            super.removeSubTaskById(id);
             save();
         } catch (RuntimeException e) {
-            throw new RemoveByIdException("В списке нет задачи с id " + ID);
+            throw new RemoveByIdException("В списке нет задачи с id " + id);
         }
     }
 
     @Override
-    public void removeEpicById(Integer ID) {
-        super.removeEpicById(ID);
+    public void removeEpicById(Integer id) {
+        super.removeEpicById(id);
         save();
     }
 
     @Override
-    public void updateTask(Integer id, Task task, Status status, LocalDateTime dateTime, long duration) {
-        super.updateTask(id, task, status, dateTime, duration);
-        prioritizedTasks.remove(task);
-        addPrioritizedTask(tasks.get(id));
+    public void updateTask(Task task) {
+        Task previous = getTaskById(task.getId());
+        super.updateTask(task);
+        getPrioritizedTasks().remove(previous);
+        addPrioritizedTask(tasks.get(task.getId()));
         save();
     }
 
     @Override
-    public void updateSubTask(Integer id, SubTask subTask, Status status, LocalDateTime dateTime, long duration) {
-        epics.get(subTask.getEpicId()).addEpicSubTasksID(id);
-        super.updateSubTask(id, subTask, status, dateTime, duration);
-        prioritizedTasks.remove(subTask);
-        addPrioritizedTask(subTasks.get(id));
+    public void updateSubTask(SubTask subTask) {
+        SubTask previous = subTasks.get(subTask.getId());
+        epics.get(subTask.getEpicId()).addEpicSubTasksID(subTask.getId());
+        super.updateSubTask(subTask);
+        getPrioritizedTasks().remove(previous);
+        addPrioritizedTask(subTasks.get(subTask.getId()));
         save();
     }
 
@@ -283,5 +279,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Task taskById = super.getTaskById(ID);
         save();
         return taskById;
+    }
+
+    @Override
+    public void updateEpic(Epic epic) {
+        super.updateEpic(epic);
+        save();
     }
 }

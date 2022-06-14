@@ -30,7 +30,8 @@ class EpicTest {
     @Test
     @DisplayName("Проверить время окончания эпической задачи")
     void getEndTimeEpicTest() {
-        assertEquals(LocalDateTime.of(2022, 7, 4, 13, 40), epic1.getEndTime(), "Не совпадает время окончания задачи");
+        assertEquals(LocalDateTime.of(2022, 7, 4, 13, 40), epic1.getEndTime(),
+                "Не совпадает время окончания задачи");
     }
 
     @Test
@@ -66,13 +67,15 @@ class EpicTest {
     @DisplayName("Проверить продолжительность эпической задачи при удалении подзадач")
     void deleteSubtaskEpicDuration() {
         taskManagerEpic.removeSubTaskById(4);
-        assertEquals(130, epic1.getDuration(), "При удалении подзадачи не совпадает продолжительность эпической задачи");
+        assertEquals(130, epic1.getDuration(), "При удалении подзадачи не совпадает " +
+                "продолжительность эпической задачи");
     }
 
     @Test
     @DisplayName("Проверить время начала эпической задачи при обновлении подзадачи")
     void updateSubTaskEpicStartTime() {
-        taskManagerEpic.updateSubTask(3, subTask2, Status.DONE, LocalDateTime.of(2022, 5, 20, 14, 0), 100);
+        taskManagerEpic.updateSubTask(new SubTask(subTask2.getTitle(), subTask2.getDescription(), epic1,
+                3, LocalDateTime.of(2022, 5, 20, 14, 0), 100, Status.DONE));
         assertEquals(LocalDateTime.of(2022, 5, 20, 14, 0), epic1.getStartTime(),
                 "При обновлении подзадач неправильно определяется время начала эпической задачи");
     }

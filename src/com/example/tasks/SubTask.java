@@ -7,7 +7,18 @@ import java.time.LocalDateTime;
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String title, String description, Epic epic, int id, LocalDateTime startTime, int duration) {
+    public SubTask(String title, String description, Epic epic, int id, LocalDateTime startTime, long duration,
+                   Status status) {
+        super(title, description, id, startTime, duration);
+        setStatus(status);
+        try {
+            setEpicId(epic.getId());
+        } catch (NullPointerException e) {
+            throw new TaskByIdAbsentException("Ссылка на неверный объект класса epic. Невозможно получить ID");
+        }
+    }
+
+    public SubTask(String title, String description, Epic epic, int id, LocalDateTime startTime, long duration) {
         super(title, description, id, startTime, duration);
         try {
             setEpicId(epic.getId());
