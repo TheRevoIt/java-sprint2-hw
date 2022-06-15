@@ -23,11 +23,6 @@ public class InMemoryTaskManager implements TaskManager {
     private int taskId = 1;
 
     @Override
-    public void setTaskId() {
-        taskId++;
-    }
-
-    @Override
     public int getTaskId() {
         return taskId;
     }
@@ -48,11 +43,13 @@ public class InMemoryTaskManager implements TaskManager {
         TreeSet<Task> priorityTask = getPrioritizedTasks();
         priorityTask.add(task);
         List<Task> priorityList = new ArrayList<>(getPrioritizedTasks());
-        for (int i = 1; i < priorityList.size(); i++)
-            if (priorityList.get(i).getStartTime() == null) break;
-            else if (priorityList.get(i - 1).getEndTime().isAfter(priorityList.get(i).getStartTime()) ||
+        for (int i = 1; i < priorityList.size(); i++) {
+            if (priorityList.get(i - 1).getStartTime() == null || priorityList.get(i).getStartTime() == null) {
+                break;
+            } else if (priorityList.get(i - 1).getEndTime().isAfter(priorityList.get(i).getStartTime()) ||
                     priorityList.get(i - 1).getEndTime().equals(priorityList.get(i).getStartTime()))
                 overlapFlag = true;
+        }
         if (overlapFlag) {
             getPrioritizedTasks().remove(task);
             throw new CreateTaskException("Происходит перекрытие задач по времени");
@@ -62,7 +59,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createTask(Task task) {
         if (Objects.nonNull(task)) {
-            setTaskId();
+            task.setId(taskId++);
+            addPrioritizedTask(task);
             tasks.put(task.getId(), task);
         } else System.out.println("При создании task передан пустой объект");
     }
@@ -72,7 +70,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (Objects.nonNull(subTask)) {
             if (Objects.isNull(epics.get(subTask.getEpicId())))
                 throw new TaskByIdAbsentException("Невозможно создать подзадачу. Проверьте id эпической задачи");
-            setTaskId();
+            subTask.setId(taskId++);
+            addPrioritizedTask(subTask);
             epics.get(subTask.getEpicId()).addEpicSubTasksID(subTask.getId());
             updateEpicTimes(subTask, "add");
             updateEpicStatus(epics.get(subTask.getEpicId()));
@@ -84,7 +83,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createEpic(Epic epic) {
         if (Objects.nonNull(epic)) {
-            setTaskId();
+            epic.setId(taskId++);
             epics.put(epic.getId(), epic);
         } else System.out.println("При создании epic передан пустой объект");
     }
@@ -154,6 +153,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeSubTaskById(Integer id) {
         if (subTasks.get(id) == null) throw new RemoveByIdException("Объекта с ID " + id + " нет в категории subTasks");
         else {
+            getPrioritizedTasks().remove(subTasks.get(id));
             Epic epic = epics.get(subTasks.get(id).getEpicId());
             epic.getEpicSubTasksID().remove(id);
             updateEpicTimes(subTasks.get(id), "remove");
@@ -167,6 +167,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epics.get(id) == null) throw new RemoveByIdException("Объекта с ID " + id + " нет в категории epics");
         else {
             for (int subTaskId : epics.get(id).getEpicSubTasksID()) {
+                getPrioritizedTasks().remove(subTasks.get(subTaskId));
                 subTasks.remove(subTaskId);
                 history.remove(subTaskId);
             }
@@ -178,7 +179,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (Objects.nonNull(tasks.get(task.getId()))) {
+            Task previous = getTaskById(task.getId());
+            getPrioritizedTasks().remove(previous);
             tasks.replace(task.getId(), task);
+            addPrioritizedTask(tasks.get(task.getId()));
         } else {
             throw new TaskByIdAbsentException("Задачи с id " + task.getId() + "не существует");
         }
@@ -232,8 +236,12 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubTask(SubTask subTask) {
         if (Objects.nonNull(subTasks.get(subTask.getId()))) {
+            SubTask previous = subTasks.get(subTask.getId());
+            getPrioritizedTasks().remove(previous);
+            epics.get(subTask.getEpicId()).addEpicSubTasksID(subTask.getId());
             subTasks.replace(subTask.getId(), subTask);
             updateEpicTimes(subTask, "update");
+            addPrioritizedTask(subTasks.get(subTask.getId()));
             updateEpicStatus(epics.get(subTask.getEpicId()));
         } else {
             throw new TaskByIdAbsentException("Задачи с id " + subTask.getId() + "не существует");

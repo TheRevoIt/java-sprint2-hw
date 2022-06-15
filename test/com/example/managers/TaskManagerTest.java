@@ -1,5 +1,6 @@
 package com.example.managers;
 
+import com.example.exception.CreateTaskException;
 import com.example.exception.RemoveByIdException;
 import com.example.exception.TaskByIdAbsentException;
 import com.example.tasks.Epic;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 abstract class TaskManagerTest<T extends TaskManager> {
 
     T taskManager;
-    Task task1;
+    private Task task1;
     Epic epic1;
     SubTask subTask1;
     SubTask subTask2;
@@ -27,7 +28,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @BeforeEach
     void init() {
-        task1 = new Task("Задача", "Пример задачи", 0, LocalDateTime.of(2022, 6,
+        task1 = new Task("Задача", "Пример задачи", 1, LocalDateTime.of(2022, 6,
                 4, 14, 0), 100);
         epic1 = new Epic("Ремонт", "Ремонт в квартире", 1);
         subTask1 = new SubTask("Стены", "Поклейка обоев", epic1, 2,
@@ -36,7 +37,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.of(2022, 6, 4, 12, 0), 100);
         subTask3 = new SubTask("Люстра", "Повесить люстру", epic1, 4,
                 null, 100);
-        epic2 = new Epic("Задачи", "Задачи на месяц", 4);
+        epic2 = new Epic("Задачи", "Задачи на месяц", 6);
     }
 
     @Test
@@ -49,7 +50,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @DisplayName("Добавление задачи")
     void addNewTask() {
         taskManager.createTask(task1);
-        final Task savedTask = taskManager.getTaskById(0);
+        final Task savedTask = taskManager.getTaskById(1);
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(task1, savedTask, "Задачи не совпадают.");
     }
@@ -71,9 +72,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     @DisplayName("Удалить задачи всех типов")
     void clearAllTasks() {
-        taskManager.createTask(task1);
         taskManager.createEpic(epic1);
         taskManager.createSubTask(subTask1);
+        taskManager.createTask(task1);
         taskManager.clearAllTasks();
         assertEquals(taskManager.getTasks().size(), 0, "Список задач не пуст");
         assertEquals(taskManager.getSubTasks().size(), 0, "Список подзадач не пуст");
@@ -105,8 +106,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @DisplayName("Вернуть задачу по id")
     void getTaskById() {
         taskManager.createTask(task1);
-        Task receivedTask = taskManager.getTaskById(0);
-        assertEquals(taskManager.getTasks().get(0), receivedTask, "Возвращается неправильная задача");
+        Task receivedTask = taskManager.getTaskById(1);
+        assertEquals(taskManager.getTasks().get(1), receivedTask, "Возвращается неправильная задача");
         assertNotNull(receivedTask, "Задача не найдена");
 
         assertThrows(TaskByIdAbsentException.class, () -> taskManager.getTaskById(2), "Возвращается" +
@@ -136,7 +137,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.createEpic(epic1);
 
-        assertThrows(RemoveByIdException.class, () -> taskManager.removeEpicById(2), "Некорректно" +
+        assertThrows(RemoveByIdException.class, () -> taskManager.removeEpicById(3), "Некорректно" +
                 " обрабатывается случай несуществующей задачи");
     }
 
@@ -144,10 +145,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @DisplayName("Удалить задачу по id")
     void removeTaskById() {
         taskManager.createTask(task1);
-        taskManager.removeTaskById(0);
+        taskManager.removeTaskById(1);
         assertEquals(taskManager.getTasks().size(), 0, "Не происходит удаления задачи");
 
-        assertThrows(RemoveByIdException.class, () -> taskManager.removeTaskById(0), "Некорректно" +
+        assertThrows(RemoveByIdException.class, () -> taskManager.removeTaskById(2), "Некорректно" +
                 " обрабатывается случай несуществующей задачи");
     }
 
@@ -155,10 +156,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @DisplayName("Обновить эпическую задачу")
     void updateEpicTask() {
         taskManager.createEpic(epic1);
-        System.out.println(taskManager.getEpics());
         taskManager.updateEpic(new Epic(epic1.getTitle(), "Обновленное описание", epic1.getId()));
-        assertEquals(taskManager.getEpics().get(epic1.getId()).getDescription(), "Обновленное описание", "Некорректно обновляются данные " +
-                "в эпической задаче");
+        assertEquals(taskManager.getEpics().get(epic1.getId()).getDescription(), "Обновленное описание",
+                "Некорректно обновляются данные в эпической задаче");
     }
 
     @Test
@@ -226,9 +226,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @DisplayName("Обновить задачу")
     void updateTask() {
         taskManager.createTask(task1);
-        Task reference = new Task("Задача", "Пример задачи", 0,
+        Task reference = new Task("Задача", "Пример задачи", 1,
                 LocalDateTime.of(2022, 6, 14, 13, 0), 200);
-        taskManager.updateTask(new Task("Задача", "Описание", 0,
+        taskManager.updateTask(new Task("Задача", "Описание", 1,
                 LocalDateTime.of(2022, 6, 14, 13, 0), 200,
                 Status.DONE));
         assertEquals(reference, task1, "Задачи не совпадают");
@@ -256,6 +256,61 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
+    @DisplayName("Проверка сортировки задач по времени старта")
+    void getPrioritizedTasksTest() {
+        taskManager.createEpic(epic1);
+        taskManager.createSubTask(subTask1);
+        taskManager.createSubTask(subTask2);
+        taskManager.createSubTask(subTask3);
+        taskManager.createTask(task1);
+        assertArrayEquals(taskManager.getPrioritizedTasks().toArray(), new Task[]{subTask1, subTask2, task1, subTask3},
+                "Выводится некорректный сортированный список");
+    }
+
+    @Test
+    @DisplayName("Проверка корректности обновления задач в сортированном списке")
+    void prioritizedTasksUpdateTest() {
+        Task testTask = new Task("Задача", "Пример задачи", 1,
+                LocalDateTime.of(2022, 6, 14, 13, 0), 200);
+        epic1 = new Epic("Ремонт", "Ремонт в квартире", 2);
+        subTask1 = new SubTask("Стены", "Поклейка обоев", epic1, 3,
+                LocalDateTime.of(2022, 5, 31, 10, 30), 30);
+        taskManager.createTask(testTask);
+        taskManager.createEpic(epic1);
+        taskManager.createSubTask(subTask1);
+        taskManager.updateTask(new Task("Задача", "Новое описание", 1,
+                LocalDateTime.of(2022, 6, 14, 13, 0), 200));
+        taskManager.updateSubTask(new SubTask("Стены", "Новое описание", epic1, 3,
+                LocalDateTime.of(2022, 5, 31, 10, 30), 30));
+        assertEquals(taskManager.getTaskById(1).getDescription(), "Новое описание",
+                "Обновление задачи приводит к ошибке о перекрытии временных интервалов");
+        assertEquals(taskManager.getTaskById(3).getDescription(), "Новое описание",
+                "Обновление задачи приводит к ошибке о перекрытии временных интервалов");
+    }
+
+    @Test
+    @DisplayName("Проверка создания задач с перекрывающимися временными интервалами")
+    void testTaskOverlap() {
+        Task testTask = new Task("Задача", "Пример задачи", 0,
+                LocalDateTime.of(2022, 6, 14, 13, 0), 200);
+        Task testTaskOverlap = new Task("Задача", "Пример задачи", 1,
+                LocalDateTime.of(2022, 6, 14, 13, 0), 200);
+        Task testTaskOverlap1 = new Task("Задача", "Пример задачи", 2,
+                LocalDateTime.of(2022, 6, 14, 13, 1), 200);
+        Task testTaskOverlap2 = new Task("Задача", "Пример задачи", 3,
+                LocalDateTime.of(2022, 6, 14, 16, 20), 200);
+        taskManager.createTask(testTask);
+        assertThrows(CreateTaskException.class, () -> taskManager.createTask(testTaskOverlap),
+                "Некорректно обрабатывается случай перекрытия задачи");
+        assertThrows(CreateTaskException.class, () -> taskManager.createTask(testTaskOverlap1),
+                "Некорректно обрабатывается случай перекрытия задачи");
+        assertThrows(CreateTaskException.class, () -> taskManager.createTask(testTaskOverlap2),
+                "Некорректно обрабатывается случай перекрытия задачи");
+        assertEquals(taskManager.getPrioritizedTasks().size(), 1,
+                "Происходит добавление задач с перекрывающимися временными интервалами");
+    }
+
+    @Test
     @DisplayName("Вывести список подзадач эпик задачи")
     void printEpicSubTasks() {
         taskManager.createEpic(epic1);
@@ -276,7 +331,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         final HashMap<Integer, Task> tasks = taskManager.getTasks();
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(1, tasks.values().size(), "Неверное количество задач.");
-        assertEquals(task1, tasks.get(0), "Задачи не совпадают.");
+        assertEquals(task1, tasks.get(1), "Задачи не совпадают.");
     }
 
     @Test

@@ -65,9 +65,6 @@ public interface TaskManager {
     // Метод возвращает словарь, содержащий все эпические задачи и их ID
     HashMap<Integer, Epic> getEpics();
 
-    // Метод увеличивает счетчик id при добавлении задачи
-    void setTaskId();
-
     // Метод возвращает id задачи
     int getTaskId();
 

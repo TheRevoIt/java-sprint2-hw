@@ -8,7 +8,7 @@ import java.util.Objects;
 public class Task {
     private final String title;
     private final String description;
-    private final int id;
+    private int id;
     private final Type type = Type.TASK;
     private Status status = Status.NEW;
     private LocalDateTime startTime;
@@ -76,6 +76,10 @@ public class Task {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Type getType() {

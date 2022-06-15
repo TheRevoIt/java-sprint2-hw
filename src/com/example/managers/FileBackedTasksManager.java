@@ -43,7 +43,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 manager.getTaskId(), LocalDateTime.of(2022, 7, 4,
                 12, 0), 100));
         manager.createSubTask(new SubTask("Стены111", "Поклейка обоев", manager.getEpics().get(1),
-                manager.getTaskId(),null, 30));
+                manager.getTaskId(), null, 30));
         manager.createEpic(new Epic("Задачи", "Задачи на месяц", manager.getTaskId()));
         manager.createTask(new Task("Задача", "Пример задачи", manager.getTaskId(),
                 LocalDateTime.of(2022, 6, 4, 14, 0), 100));
@@ -182,14 +182,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public void createTask(Task task) {
-        addPrioritizedTask(task);
         super.createTask(task);
         save();
     }
 
     @Override
     public void createSubTask(SubTask subTask) {
-        addPrioritizedTask(subTask);
         super.createSubTask(subTask);
         save();
     }
@@ -202,21 +200,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public void clearAllTasks() {
-        getPrioritizedTasks().clear();
         super.clearAllTasks();
         save();
     }
 
     @Override
     public void clearTasks() {
-        for (Task el : tasks.values()) getPrioritizedTasks().remove(el);
         super.clearTasks();
         save();
     }
 
     @Override
     public void clearSubTasks() {
-        for (SubTask el : subTasks.values()) getPrioritizedTasks().remove(el);
         super.clearSubTasks();
         save();
     }
@@ -230,7 +225,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     @Override
     public void removeTaskById(Integer id) {
         try {
-            getPrioritizedTasks().remove(getTaskById(id));
             super.removeTaskById(id);
             save();
         } catch (RuntimeException e) {
@@ -241,7 +235,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     @Override
     public void removeSubTaskById(Integer id) {
         try {
-            getPrioritizedTasks().remove(getTaskById(id));
             super.removeSubTaskById(id);
             save();
         } catch (RuntimeException e) {
@@ -257,20 +250,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public void updateTask(Task task) {
-        Task previous = getTaskById(task.getId());
         super.updateTask(task);
-        getPrioritizedTasks().remove(previous);
-        addPrioritizedTask(tasks.get(task.getId()));
         save();
     }
 
     @Override
     public void updateSubTask(SubTask subTask) {
-        SubTask previous = subTasks.get(subTask.getId());
-        epics.get(subTask.getEpicId()).addEpicSubTasksID(subTask.getId());
         super.updateSubTask(subTask);
-        getPrioritizedTasks().remove(previous);
-        addPrioritizedTask(subTasks.get(subTask.getId()));
         save();
     }
 
