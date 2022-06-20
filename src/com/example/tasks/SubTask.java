@@ -11,6 +11,7 @@ public class SubTask extends Task {
                    Status status) {
         super(title, description, id, startTime, duration);
         setStatus(status);
+        setType(Type.SUBTASK);
         try {
             setEpicId(epic.getId());
         } catch (NullPointerException e) {
@@ -20,6 +21,7 @@ public class SubTask extends Task {
 
     public SubTask(String title, String description, Epic epic, int id, LocalDateTime startTime, long duration) {
         super(title, description, id, startTime, duration);
+        setType(Type.SUBTASK);
         try {
             setEpicId(epic.getId());
         } catch (NullPointerException e) {
@@ -33,11 +35,6 @@ public class SubTask extends Task {
 
     private void setEpicId(int epicId) {
         this.epicId = epicId;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.SUBTASK;
     }
 
     @Override

@@ -9,10 +9,12 @@ public class Epic extends Task {
 
     public Epic(String title, String description, int id, LocalDateTime parse, long parseInt) {
         super(title, description, id, parse, parseInt);
+        setType(Type.EPIC);
     }
 
     public Epic(String title, String description, int id) {
         super(title, description, id);
+        setType(Type.EPIC);
     }
 
     public ArrayList<Integer> getEpicSubTasksID() {
@@ -42,11 +44,6 @@ public class Epic extends Task {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.EPIC;
     }
 
     @Override

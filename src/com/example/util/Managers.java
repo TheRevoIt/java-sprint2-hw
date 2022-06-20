@@ -1,11 +1,6 @@
 package com.example.util;
 
-import com.example.managers.FileBackedTasksManager;
-import com.example.managers.HistoryManager;
-import com.example.managers.InMemoryHistoryManager;
-import com.example.managers.TaskManager;
-
-import java.io.File;
+import com.example.managers.*;
 
 public class Managers {
     private static final HistoryManager historyManager = new InMemoryHistoryManager();
@@ -14,7 +9,7 @@ public class Managers {
     }
 
     public static TaskManager getDefault() {
-        return new FileBackedTasksManager(new File("resources/mem.csv"));
+        return new HttpTaskManager("http://localhost:8078/");
     }
 
     public static HistoryManager getDefaultHistory() {

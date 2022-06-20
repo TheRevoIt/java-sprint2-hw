@@ -71,5 +71,6 @@ public interface TaskManager {
     // Метод возвращает объект менеджера истории просмотров
     HistoryManager getHistoryManager();
 
+    // Метод возвращает отсортированный список задач
     TreeSet<Task> getPrioritizedTasks();
 }

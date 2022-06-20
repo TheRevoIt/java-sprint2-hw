@@ -1,60 +1,39 @@
 package com.example;
 
+import com.example.kvserver.KVServer;
+import com.example.managers.HttpTaskManager;
 import com.example.managers.TaskManager;
 import com.example.tasks.Epic;
-import com.example.tasks.Status;
 import com.example.tasks.SubTask;
 import com.example.tasks.Task;
 import com.example.util.Managers;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        KVServer server = new KVServer();
+        server.start();
         TaskManager manager = Managers.getDefault();
-        manager.createEpic(new Epic("Ремонт", "Ремонт в квартире", manager.getTaskId()));
-        manager.createSubTask(new SubTask("Стены", "Поклейка обоев", manager.getEpics().get(1), manager.getTaskId(),
-                LocalDateTime.of(2022, 5, 31, 10, 30), 30));
-        manager.createSubTask(new SubTask("Пол", "Укладка ламината", manager.getEpics().get(1), manager.getTaskId(),
-                LocalDateTime.of(2022, 6, 4, 12, 0), 100));
-        manager.createSubTask(new SubTask("Люстра", "Повесить люстру", manager.getEpics().get(1), manager.getTaskId(),
-                LocalDateTime.of(2022, 7, 4, 12, 0), 100));
-        manager.createEpic(new Epic("Задачи", "Задачи на месяц", manager.getTaskId()));
-        manager.getTaskById(3);
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
+        Task task1 = new Task("Задача", "Пример задачи", 1, LocalDateTime.of(2022, 6,
+                4, 14, 0), 100);
+        Epic epic1 = new Epic("Ремонт", "Ремонт в квартире", 2);
+        SubTask subTask1 = new SubTask("Стены", "Поклейка обоев", epic1, 3,
+                LocalDateTime.of(2022, 5, 31, 10, 30), 30);
+        manager.createTask(task1);
+        manager.createEpic(epic1);
+        manager.createSubTask(subTask1);
+        manager.getTaskById(1);
         manager.getTaskById(2);
-        manager.updateSubTask(new SubTask("Стены", "Поклейка обоев", manager.getEpics().get(1), 2,
-                LocalDateTime.of(2022, 5, 31, 10, 30), 30, Status.DONE));
-        manager.updateSubTask(new SubTask("Пол", "Укладка ламината", manager.getEpics().get(1), 3,
-                LocalDateTime.of(2022, 6, 4, 12, 0), 100, Status.DONE));
-        manager.updateSubTask(new SubTask("Люстра", "Повесить люстру", manager.getEpics().get(1), 4,
-                LocalDateTime.of(2022, 7, 4, 12, 0), 100, Status.DONE));
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
-        manager.getTaskById(5);
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
-        manager.getTaskById(1);
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
-        manager.getTaskById(1);
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
         manager.getTaskById(3);
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
-        manager.removeSubTaskById(3);
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
-        manager.getEpicSubTasks(1);
-        manager.removeEpicById(1);
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
-        manager.clearAllTasks();
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
-        manager.createTask(new Task("Задача", "Пример задачи", manager.getTaskId()));
-        manager.updateTask(new Task("Задача", "Пример задачи", 6, manager.getTasks().get(6).getStartTime(),
-                manager.getTasks().get(6).getDuration(), Status.IN_PROGRESS ));
-        manager.getTaskById(6);
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
-        manager.removeTaskById(6);
-        System.out.println("История просмотра задач: " + manager.getHistoryManager().getHistory());
-        manager.clearEpics();
-        manager.clearSubTasks();
-        manager.clearTasks();
+        TaskManager manager1 = new HttpTaskManager();
+        System.out.println(manager1.getTasks());
+        System.out.println(manager1.getEpics());
+        System.out.println(manager1.getSubTasks());
+        System.out.println(manager1.getHistoryManager().getHistory());
+        System.out.println(manager1.getPrioritizedTasks());
+        server.stop();
     }
 }

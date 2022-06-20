@@ -94,6 +94,7 @@ public class InMemoryTaskManager implements TaskManager {
         getPrioritizedTasks().clear();
         clearSubTasks();
         clearEpics();
+        taskId = 1;
     }
 
     @Override
@@ -109,7 +110,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void clearSubTasks() {
         for (Integer element : subTasks.keySet()) {
             history.remove(element);
-            getPrioritizedTasks().remove(tasks.get(element));
+            TreeSet<Task> prioritized = getPrioritizedTasks();
+            getPrioritizedTasks().remove(subTasks.get(element));
         }
         for (Epic epic : epics.values()) {
             epic.getEpicSubTasksID().clear();

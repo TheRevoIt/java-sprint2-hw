@@ -25,9 +25,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private final Path path;
     private final File dataFile;
 
-    public FileBackedTasksManager(File file) {
+    FileBackedTasksManager(File file) {
         this.path = file.toPath().getParent();
         this.dataFile = file.toPath().getFileName().toFile();
+    }
+
+    FileBackedTasksManager() {
+        path = null;
+        dataFile = null;
     }
 
     public static void main(String[] args) {
@@ -118,7 +123,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return history;
     }
 
-    void save() {
+    public void save() {
         if (!Files.exists(path)) {
             File directory = new File(String.valueOf(path));
             boolean creation = directory.mkdir();

@@ -9,7 +9,8 @@ public class Task {
     private final String title;
     private final String description;
     private int id;
-    private final Type type = Type.TASK;
+
+    private Type type = Type.TASK;
     private Status status = Status.NEW;
     private LocalDateTime startTime;
     private long duration;
@@ -92,6 +93,10 @@ public class Task {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
         return id == task.id;
+    }
+
+    void setType(Type type) {
+        this.type = type;
     }
 
     @Override
