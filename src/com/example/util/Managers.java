@@ -8,8 +8,8 @@ public class Managers {
     private Managers() {
     }
 
-    public static TaskManager getDefault() {
-        return new HttpTaskManager("http://localhost:8078/");
+    public static TaskManager getDefault(boolean loadFlag) {
+        return new HttpTaskManager("http://localhost:8078/", loadFlag);
     }
 
     public static HistoryManager getDefaultHistory() {

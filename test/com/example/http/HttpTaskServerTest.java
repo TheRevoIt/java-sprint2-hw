@@ -1,16 +1,20 @@
 package com.example.http;
 
 import com.example.kvserver.KVServer;
-import com.example.managers.HttpTaskManager;
 import com.example.managers.TaskManager;
 import com.example.tasks.Epic;
 import com.example.tasks.SubTask;
 import com.example.tasks.Task;
 import com.example.util.LocalDateTimeAdapter;
+import com.example.util.Managers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
@@ -45,7 +49,7 @@ class HttpTaskServerTest {
         kvServer.start();
         httpTaskServer = new HttpTaskServer();
         client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
-        task1 = new Task("Задача", "Пример задачи", 1, LocalDateTime.of(2022, 6,
+        task1 = new Task("Задача", "Пример задачи", null, LocalDateTime.of(2022, 6,
                 4, 14, 0), 100);
         epic1 = new Epic("Ремонт", "Ремонт в квартире", 2);
         subTask1 = new SubTask("Стены", "Поклейка обоев", epic1, 3,
@@ -103,6 +107,8 @@ class HttpTaskServerTest {
     @Test
     @DisplayName("Тест создания задачи")
     void taskCreateTest() throws IOException, InterruptedException {
+        task1 = new Task("Задача", "Пример задачи", null, LocalDateTime.of(2022, 6,
+                4, 14, 0), 100);
         taskManager.clearTasks();
         URI url = URI.create("http://localhost:8080/tasks/task/");
         String json = gson.toJson(task1);
@@ -120,7 +126,7 @@ class HttpTaskServerTest {
                 4, 14, 0), 100);
         String json = gson.toJson(testTask);
         HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        final HttpRequest request = HttpRequest.newBuilder().uri(url).PUT(body).build();
+        final HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals("Новое описание задачи",
                 taskManager.getTasks().get(1).getDescription(), "Ошибка при обновлении задачи");
@@ -172,6 +178,8 @@ class HttpTaskServerTest {
     @Test
     @DisplayName("Тест создания подзадачи")
     void subtaskCreateTest() throws IOException, InterruptedException {
+        subTask1 = new SubTask("Стены", "Поклейка обоев", epic1, null,
+                LocalDateTime.of(2022, 5, 31, 10, 30), 30);
         taskManager.clearSubTasks();
         taskManager.createEpic(epic1);
         URI url = URI.create("http://localhost:8080/tasks/subtask/");
@@ -192,7 +200,7 @@ class HttpTaskServerTest {
                 LocalDateTime.of(2022, 5, 31, 10, 30), 30);
         String json = gson.toJson(testSubTask);
         HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        final HttpRequest request = HttpRequest.newBuilder().uri(url).PUT(body).build();
+        final HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals("Новое описание подзадачи",
                 taskManager.getSubTasks().get(3).getDescription(), "Ошибка при обновлении задачи");
@@ -251,6 +259,7 @@ class HttpTaskServerTest {
     @DisplayName("Тест создания эпической задачи")
     void epicCreateTest() throws IOException, InterruptedException {
         taskManager.clearEpics();
+        epic1 = new Epic("Ремонт", "Ремонт в квартире", null);
         URI url = URI.create("http://localhost:8080/tasks/epic/");
         String json = gson.toJson(epic1);
         HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
@@ -262,6 +271,7 @@ class HttpTaskServerTest {
     @Test
     @DisplayName("Тест обновления эпической задачи")
     void taskUpdateEpic() throws IOException, InterruptedException {
+        taskManager.createEpic(epic1);
         URI url = URI.create("http://localhost:8080/tasks/epic/");
         Epic testEpic = new Epic("Ремонт", "Новое описание", 2);
         String json = gson.toJson(testEpic);
@@ -319,7 +329,7 @@ class HttpTaskServerTest {
         taskManager.createEpic(epic1);
         taskManager.getTaskById(1);
         taskManager.getTaskById(2);
-        TaskManager taskManagerRestored = new HttpTaskManager();
+        TaskManager taskManagerRestored = Managers.getDefault(true);
         assertArrayEquals(taskManager.getTasks().values().toArray(),
                 taskManagerRestored.getTasks().values().toArray(), "Некорректно подгружается список задач");
         assertArrayEquals(taskManager.getEpics().values().toArray(),
@@ -352,7 +362,6 @@ class HttpTaskServerTest {
         HashMap<Integer, Task> restored = gson.fromJson(testMap, new TypeToken<HashMap<Integer, Task>>() {
         }.getType());
         System.out.println(restored);
-
         assertEquals(task1, taskRestored, "Ошибка при десериализации задачи");
         assertEquals(epic1, epicRestored, "Ошибка при десериализации эпической задачи");
         assertEquals(map.toString(), restored.toString(), "Ошибка при десериализации хеш-мап структуры");

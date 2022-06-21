@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class SubTask extends Task {
     private int epicId;
 
-    public SubTask(String title, String description, Epic epic, int id, LocalDateTime startTime, long duration,
+    public SubTask(String title, String description, Epic epic, Integer id, LocalDateTime startTime, long duration,
                    Status status) {
         super(title, description, id, startTime, duration);
         setStatus(status);
@@ -19,7 +19,7 @@ public class SubTask extends Task {
         }
     }
 
-    public SubTask(String title, String description, Epic epic, int id, LocalDateTime startTime, long duration) {
+    public SubTask(String title, String description, Epic epic, Integer id, LocalDateTime startTime, long duration) {
         super(title, description, id, startTime, duration);
         setType(Type.SUBTASK);
         try {

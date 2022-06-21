@@ -14,13 +14,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
-    final HashMap<Integer, Task> tasks = new HashMap<>();
-    final HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    final HashMap<Integer, Epic> epics = new HashMap<>();
+    HashMap<Integer, Task> tasks = new HashMap<>();
+    HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    HashMap<Integer, Epic> epics = new HashMap<>();
     private final TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime,
             Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(Task::getId));
     private final HistoryManager history = Managers.getDefaultHistory();
-    private int taskId = 1;
+    int taskId = 1;
 
     @Override
     public int getTaskId() {

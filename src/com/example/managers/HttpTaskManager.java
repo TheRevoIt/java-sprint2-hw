@@ -11,37 +11,34 @@ import com.google.gson.reflect.TypeToken;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
+import java.util.stream.Collectors;
 
 public class HttpTaskManager extends FileBackedTasksManager {
     private static KVTaskClient client;
     private final Gson gson;
 
-    public HttpTaskManager(String url) {
+    public HttpTaskManager(String url, boolean loadFlag) {
         client = new KVTaskClient(url);
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
         gson = gsonBuilder.create();
-    }
-
-    public HttpTaskManager() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
-        gson = gsonBuilder.create();
-        load();
+        if (loadFlag) {
+            load();
+        }
     }
 
     @Override
     public void save() {
-        System.out.println();
         String tasksSerialized = gson.toJson(getTasks());
         String epicsSerialized = gson.toJson(getEpics());
         String subtasksSerialized = gson.toJson(getSubTasks());
-        String historySerialized = gson.toJson(getHistoryManager().getHistory());
+        String historySerialized = gson.toJson(getHistoryManager().getHistory()
+                .stream().map(Task::getId).collect(Collectors.toList()));
         client.put("tasks", tasksSerialized);
         client.put("epics", epicsSerialized);
         client.put("subtasks", subtasksSerialized);
         client.put("history", historySerialized);
+        client.put("taskId", String.valueOf(taskId));
     }
 
     private void load() {
@@ -54,19 +51,19 @@ public class HttpTaskManager extends FileBackedTasksManager {
         HashMap<Integer, SubTask> serverSubTasks = gson.fromJson(client.load("subtasks"),
                 new TypeToken<HashMap<Integer, SubTask>>() {
                 }.getType());
-        List<Task> serverHistory = gson.fromJson(client.load("history"), new TypeToken<List<Task>>() {
-        }.getType());
-        for (Task el : serverTasks.values()) {
-            createTask(el);
+        tasks = serverTasks;
+        epics = serverEpics;
+        subTasks = serverSubTasks;
+        taskId = Integer.parseInt(client.load("taskId"));
+        String serverHistory = client.load("history");
+        for (String element : serverHistory.substring(1, serverHistory.length() - 1).split(",")) {
+            getHistoryManager().add(getTaskById(Integer.parseInt(element)));
         }
-        for (Epic el : serverEpics.values()) {
-            createEpic(el);
+        for (Task task : tasks.values()) {
+            addPrioritizedTask(task);
         }
-        for (SubTask el : serverSubTasks.values()) {
-            createSubTask(el);
-        }
-        for (Task element : serverHistory) {
-            getHistoryManager().add(element);
+        for (SubTask subtask : subTasks.values()) {
+            addPrioritizedTask(subtask);
         }
     }
 }

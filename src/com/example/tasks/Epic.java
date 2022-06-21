@@ -7,12 +7,12 @@ public class Epic extends Task {
     private final ArrayList<Integer> epicSubTasksID = new ArrayList<>();
     private LocalDateTime endTime;
 
-    public Epic(String title, String description, int id, LocalDateTime parse, long parseInt) {
+    public Epic(String title, String description, Integer id, LocalDateTime parse, long parseInt) {
         super(title, description, id, parse, parseInt);
         setType(Type.EPIC);
     }
 
-    public Epic(String title, String description, int id) {
+    public Epic(String title, String description, Integer id) {
         super(title, description, id);
         setType(Type.EPIC);
     }

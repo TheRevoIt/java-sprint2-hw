@@ -57,7 +57,7 @@ public class KVTaskClient {
                     .uri(URI.create(server + "save/" + key + "?API_TOKEN=" + this.apiKey))
                     .POST(body)
                     .build();
-            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
             if (response.statusCode() != 200) {
                 throw new RuntimeException("");
             }

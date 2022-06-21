@@ -8,14 +8,14 @@ import java.util.Objects;
 public class Task {
     private final String title;
     private final String description;
-    private int id;
+    private Integer id;
 
     private Type type = Type.TASK;
     private Status status = Status.NEW;
     private LocalDateTime startTime;
     private long duration;
 
-    public Task(String title, String description, int id, LocalDateTime startTime, long duration, Status status) {
+    public Task(String title, String description, Integer id, LocalDateTime startTime, long duration, Status status) {
         this.title = title;
         this.description = description;
         this.id = id;
@@ -24,7 +24,7 @@ public class Task {
         this.status = status;
     }
 
-    public Task(String title, String description, int id, LocalDateTime startTime, long duration) {
+    public Task(String title, String description, Integer id, LocalDateTime startTime, long duration) {
         this.title = title;
         this.description = description;
         this.id = id;
@@ -32,7 +32,7 @@ public class Task {
         this.duration = duration;
     }
 
-    public Task(String title, String description, int id) {
+    public Task(String title, String description, Integer id) {
         this.title = title;
         this.description = description;
         this.id = id;
@@ -75,7 +75,7 @@ public class Task {
         this.status = status;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -92,7 +92,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id;
+        return Objects.equals(id, task.id);
     }
 
     void setType(Type type) {

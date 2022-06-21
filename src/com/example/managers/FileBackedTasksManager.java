@@ -36,7 +36,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
-        TaskManager manager = Managers.getDefault();
+        TaskManager manager = Managers.getDefault(false);
         manager.createEpic(new Epic("Ремонт", "Ремонт в квартире", manager.getTaskId()));
         manager.createSubTask(new SubTask("Стены", "Поклейка обоев", manager.getEpics().get(1),
                 manager.getTaskId(), LocalDateTime.of(2022, 5, 31,
@@ -107,7 +107,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Iterator<Task> iterator = manager.getHistory().iterator();
         while (iterator.hasNext()) {
             Task current = iterator.next();
-            sb.append(Integer.valueOf(current.getId()));
+            sb.append(current.getId());
             if (iterator.hasNext()) sb.append(",");
         }
         return sb.toString();
